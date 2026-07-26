@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mimi-deck",
+  "main": "src/worker.tsx",
+  "compatibility_date": "2026-07-26",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+  },
+  "triggers": {
+    "crons": ["43 18 * * *"],
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mimi-deck",
+      "database_id": "67290c58-e0f8-456c-a0d0-995a1fc946e3",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "ratelimits": [
+    {
+      "name": "SEARCH_RATE_LIMITER",
+      "namespace_id": "6001",
+      "simple": {
+        "limit": 10,
+        "period": 60,
+      },
+    },
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+  },
+}
