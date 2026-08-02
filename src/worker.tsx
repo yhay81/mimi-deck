@@ -167,7 +167,7 @@ app.post("/api/search", async (c) => {
     },
     headers: {
       accept: "application/json",
-      "user-agent": "MimiDeck/0.1 (+https://mimi-deck.yusuke8h.workers.dev)",
+      "user-agent": "MimiDeck/0.1 (+https://mimi-deck.yhay81.com)",
     },
   });
   if (!upstream.ok) {

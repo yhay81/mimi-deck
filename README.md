@@ -2,7 +2,7 @@
 
 気になるテーマから日本語ポッドキャストのエピソードを探し、「今度聴く」を端末へ残せるWebツールです。
 
-<https://mimi-deck.yusuke8h.workers.dev>
+<https://mimi-deck.yhay81.com>
 
 ## Main flow
 
