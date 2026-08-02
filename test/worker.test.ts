@@ -6,6 +6,7 @@ const bind = vi.fn(() => ({}) as D1PreparedStatement);
 const prepare = vi.fn(() => ({ bind }) as unknown as D1PreparedStatement);
 const batch = vi.fn(() => Promise.resolve([]));
 const assetsFetch = vi.fn(() => Promise.resolve(Response.json({ episodes: [] })));
+const remoteFetch = vi.fn(() => Promise.resolve(Response.json({ episodes: [] })));
 const bindings = {
   ASSETS: {
     fetch: assetsFetch,
@@ -47,6 +48,23 @@ describe("worker", () => {
         generatedAt: "2026-08-02T00:00:00.000Z",
       }),
     );
+    remoteFetch.mockClear();
+    remoteFetch.mockResolvedValue(
+      Response.json({
+        episodes: [
+          catalogEpisode,
+          ...Array.from({ length: 99 }, (_, index) => ({
+            ...catalogEpisode,
+            description: "子育ての工夫を紹介します。",
+            title: `子育て便り ${index + 1}`,
+            topics: ["子育て"],
+            trackId: `child-${index + 1}`,
+          })),
+        ],
+        generatedAt: "2026-08-02T00:00:00.000Z",
+      }),
+    );
+    vi.stubGlobal("fetch", remoteFetch);
   });
 
   it("renders the actual Japanese episode discovery workspace", async () => {
@@ -102,7 +120,11 @@ describe("worker", () => {
       show: "歴史を面白く学ぶラジオ",
       title: "平安京の一日",
     });
-    expect(assetsFetch).toHaveBeenCalledOnce();
+    expect(remoteFetch).toHaveBeenCalledWith(
+      "https://raw.githubusercontent.com/yhay81/mimi-deck/main/public/episodes.json",
+      expect.objectContaining({ cf: { cacheEverything: true, cacheTtl: 3600 } }),
+    );
+    expect(assetsFetch).not.toHaveBeenCalled();
   });
 
   it.each([

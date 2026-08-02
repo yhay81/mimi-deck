@@ -40,8 +40,8 @@ if (-not (Test-Path -LiteralPath $CatalogPath)) {
 }
 $Catalog = Get-Content -Raw -LiteralPath $CatalogPath | ConvertFrom-Json
 $Episodes = @($Catalog.episodes)
-if ($Episodes.Count -lt 100 -or $Episodes.Count -gt 500) {
-    throw "Podcast catalog must contain 100-500 episodes, found $($Episodes.Count)"
+if ($Episodes.Count -lt 100 -or $Episodes.Count -gt 750) {
+    throw "Podcast catalog must contain 100-750 episodes, found $($Episodes.Count)"
 }
 $TrackIds = @($Episodes | ForEach-Object { [string]$_.trackId })
 if (@($TrackIds | Sort-Object -Unique).Count -ne $Episodes.Count) {

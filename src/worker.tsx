@@ -26,6 +26,7 @@ type CatalogPayload = { episodes?: CatalogEpisode[]; generatedAt?: string };
 
 const eventNames = new Set(["visited", "searched", "saved", "opened", "returned"]);
 const sessionIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const catalogUrl = "https://raw.githubusercontent.com/yhay81/mimi-deck/main/public/episodes.json";
 let catalogPromise: Promise<CatalogEpisode[]> | undefined;
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -70,18 +71,35 @@ function isCatalogEpisode(value: unknown): value is CatalogEpisode {
   );
 }
 
+function catalogEpisodes(payload: CatalogPayload) {
+  return (Array.isArray(payload.episodes) ? payload.episodes : [])
+    .filter(isCatalogEpisode)
+    .slice(0, 750);
+}
+
 function loadCatalog(assets: Fetcher, requestUrl: string) {
-  catalogPromise ??= assets
-    .fetch(new Request(new URL("/episodes.json", requestUrl)))
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(`catalog_http_${response.status}`);
+  catalogPromise ??= (async () => {
+    try {
+      const current = await fetch(catalogUrl, {
+        cf: { cacheEverything: true, cacheTtl: 3600 },
+        headers: { accept: "application/json" },
+      });
+      if (current.ok) {
+        const episodes = catalogEpisodes((await current.json()) as CatalogPayload);
+        if (episodes.length >= 100) {
+          return episodes;
+        }
       }
-      const payload = (await response.json()) as CatalogPayload;
-      return (Array.isArray(payload.episodes) ? payload.episodes : [])
-        .filter(isCatalogEpisode)
-        .slice(0, 500);
-    });
+    } catch {
+      // The deployed catalog below keeps search available when GitHub is unavailable.
+    }
+
+    const bundled = await assets.fetch(new Request(new URL("/episodes.json", requestUrl)));
+    if (!bundled.ok) {
+      throw new Error(`catalog_http_${bundled.status}`);
+    }
+    return catalogEpisodes((await bundled.json()) as CatalogPayload);
+  })();
   return catalogPromise;
 }
 

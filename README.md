@@ -13,6 +13,8 @@
 
 AppleのiTunes Search APIから定期生成した公開カタログを検索元として使います。利用者の検索語をAppleへ直接送信せず、検索語、番組名、保存カードはD1へ記録しません。Better Auth、外部解析SDK、音声プロキシ、決済はありません。
 
+公開カタログは毎週GitHub Actionsで更新し、Workerは最新版を1時間キャッシュします。GitHubから読めない場合も、直近の配信版へ自動的に戻ります。
+
 ## Development
 
 ```powershell

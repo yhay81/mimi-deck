@@ -15,6 +15,9 @@ const topics = [
   "健康",
   "テクノロジー",
   "文化",
+  "宇宙",
+  "転職",
+  "平安時代",
 ];
 const japanesePattern = /[\u3040-\u30ff\u3400-\u9fff]/;
 const outputPath = resolve(
@@ -135,7 +138,7 @@ for (const topic of topics) {
 
 const episodes = [...episodesById.values()]
   .sort((left, right) => right.releaseDate.localeCompare(left.releaseDate))
-  .slice(0, 500);
+  .slice(0, 750);
 if (episodes.length < 100) {
   throw new Error(`Catalog is unexpectedly small: ${episodes.length} episodes`);
 }
