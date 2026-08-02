@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T16:04:23.793Z",
+  "generatedAt": "2026-08-02T16:11:17.251Z",
   "topics": [
     "歴史",
     "子育て",
@@ -315,6 +315,19 @@
       "url": "https://podcasts.apple.com/jp/podcast/aug-2-6pm-the-latest-news/id1572249005?i=1000779516665&uo=4"
     },
     {
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts221/v4/97/df/8e/97df8eed-c3d0-880b-eee3-0555114630f1/mza_5352965439473319906.jpg/600x600bb.jpg",
+      "collectionId": "6785383721",
+      "description": "第6回は、採用に関する話題です。今、この時代に介護職を志す学生たちは、先見の明があると左は話します。その理由とは？ 特別養護老人ホームちとせ稲毛 副施設長・津曲俊明とともにお送りします。",
+      "durationMs": 740000,
+      "genre": "",
+      "releaseDate": "2026-08-02T09:00:00Z",
+      "show": "左敬真のスイッチON！ラジオ",
+      "title": "#06｜ 介護を学ぶ学生たちへ",
+      "topics": ["社会"],
+      "trackId": "1000779518657",
+      "url": "https://podcasts.apple.com/jp/podcast/06-%E4%BB%8B%E8%AD%B7%E3%82%92%E5%AD%A6%E3%81%B6%E5%AD%A6%E7%94%9F%E3%81%9F%E3%81%A1%E3%81%B8/id6785383721?i=1000779518657&uo=4"
+    },
+    {
       "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts221/v4/eb/37/78/eb377824-6a35-1c00-85ba-f55f73a8ce8f/mza_16563277299036622063.jpg/600x600bb.jpg",
       "collectionId": "1775130625",
       "description": "【無料】Udemy、デビューしました！無料動画を受け取ってくださると応援になります！内容は新NISAに対する解説です。初心者向けです。↓ https://www.udemy.com/course/nisa1-vt/?referralCode=CC1EF5638F1088DCF116Udemyが初めての方はこちらが受講生用アカウント開設動画です。所用1～2分・無料で開設できます。（スマホアプリもあります）↓※音が出ます。 https://vimeo.com/1059374855",
@@ -495,19 +508,6 @@
       "topics": ["ニュース"],
       "trackId": "1000779489864",
       "url": "https://podcasts.apple.com/jp/podcast/%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9-2026%E5%B9%B48%E6%9C%882%E6%97%A5%E5%8D%88%E5%BE%8C2-00/id1375127123?i=1000779489864&uo=4"
-    },
-    {
-      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts221/v4/54/8f/af/548faf4c-f496-897b-6cc4-05e304b5e843/mza_8190398333265433111.jpg/600x600bb.jpg",
-      "collectionId": "6797157525",
-      "description": "这集播客探讨了社会设计对个体的规训，分析了现代制度如何通过教育将儿童重塑为符合可预测性与效率要求的“理想成年人”。作者指出，社会虽然奖励可靠性、杠杆和稀缺性等行为特质，但这些外部评价并不直接等同于个体的内在幸福。文中通过对 MBTI 与纳瓦尔思想的引申，揭示了社会价值曲线与主观体验曲线之间的错位，强调两者需要动态校准。文章最终主张，成熟的标志是具备适应制度的能力，同时保留一块不被外界定义的内在领地。这种深刻的反思鼓励人们在追求外部成功的同时，不丧失对真实生命的体察。 本节目为",
-      "durationMs": 1198000,
-      "genre": "",
-      "releaseDate": "2026-08-02T05:01:01Z",
-      "show": "洋葱与篝火",
-      "title": "社会设计与儿童规训：从秩序、人格到财富与幸福",
-      "topics": ["社会"],
-      "trackId": "1000779490115",
-      "url": "https://podcasts.apple.com/jp/podcast/%E7%A4%BE%E4%BC%9A%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%84%BF%E7%AB%A5%E8%A7%84%E8%AE%AD-%E4%BB%8E%E7%A7%A9%E5%BA%8F-%E4%BA%BA%E6%A0%BC%E5%88%B0%E8%B4%A2%E5%AF%8C%E4%B8%8E%E5%B9%B8%E7%A6%8F/id6797157525?i=1000779490115&uo=4"
     },
     {
       "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/23/2e/f4/232ef469-cf6c-fdd1-6497-7f4912d967c8/mza_13004005959734225573.jpg/600x600bb.jpg",
@@ -1987,7 +1987,7 @@
       "releaseDate": "2026-07-29T21:30:00Z",
       "show": "文化系トークラジオ Life～社会時評＆カルチャー",
       "title": "働き者ラジオ「シリアスゲーム」（工藤郁子×山本ぽてと）",
-      "topics": ["文化", "社会"],
+      "topics": ["社会", "文化"],
       "trackId": "1000778985166",
       "url": "https://podcasts.apple.com/jp/podcast/%E5%83%8D%E3%81%8D%E8%80%85%E3%83%A9%E3%82%B8%E3%82%AA-%E3%82%B7%E3%83%AA%E3%82%A2%E3%82%B9%E3%82%B2%E3%83%BC%E3%83%A0-%E5%B7%A5%E8%97%A4%E9%83%81%E5%AD%90-%E5%B1%B1%E6%9C%AC%E3%81%BD%E3%81%A6%E3%81%A8/id1546033052?i=1000778985166&uo=4"
     },
@@ -2520,7 +2520,7 @@
       "releaseDate": "2026-07-27T21:30:00Z",
       "show": "文化系トークラジオ Life～社会時評＆カルチャー",
       "title": "「山田五郎 オトナの教養講座」おすすめ回を語る▽塚越健司のホンのちょっとした話 第52回",
-      "topics": ["文化", "社会"],
+      "topics": ["社会", "文化"],
       "trackId": "1000778610193",
       "url": "https://podcasts.apple.com/jp/podcast/%E5%B1%B1%E7%94%B0%E4%BA%94%E9%83%8E-%E3%82%AA%E3%83%88%E3%83%8A%E3%81%AE%E6%95%99%E9%A4%8A%E8%AC%9B%E5%BA%A7-%E3%81%8A%E3%81%99%E3%81%99%E3%82%81%E5%9B%9E%E3%82%92%E8%AA%9E%E3%82%8B-%E5%A1%9A%E8%B6%8A%E5%81%A5%E5%8F%B8%E3%81%AE%E3%83%9B%E3%83%B3%E3%81%AE%E3%81%A1%E3%82%87%E3%81%A3%E3%81%A8%E3%81%97%E3%81%9F%E8%A9%B1-%E7%AC%AC52%E5%9B%9E/id1546033052?i=1000778610193&uo=4"
     },
@@ -3768,7 +3768,7 @@
       "releaseDate": "2026-07-23T21:30:54Z",
       "show": "「タイムマシン・サイエンス」 〜科学が照らす、歴史の真実〜",
       "title": "4万年前の骨に刻まれた「文字」は、本当に人類最古の文字だったのか",
-      "topics": ["歴史", "科学"],
+      "topics": ["科学", "歴史"],
       "trackId": "1000778097154",
       "url": "https://podcasts.apple.com/jp/podcast/4%E4%B8%87%E5%B9%B4%E5%89%8D%E3%81%AE%E9%AA%A8%E3%81%AB%E5%88%BB%E3%81%BE%E3%82%8C%E3%81%9F-%E6%96%87%E5%AD%97-%E3%81%AF-%E6%9C%AC%E5%BD%93%E3%81%AB%E4%BA%BA%E9%A1%9E%E6%9C%80%E5%8F%A4%E3%81%AE%E6%96%87%E5%AD%97%E3%81%A0%E3%81%A3%E3%81%9F%E3%81%AE%E3%81%8B/id1865323060?i=1000778097154&uo=4"
     },
@@ -4158,7 +4158,7 @@
       "releaseDate": "2026-07-22T21:30:00Z",
       "show": "文化系トークラジオ Life～社会時評＆カルチャー",
       "title": "働き者ラジオ「ライブ感」（工藤郁子×山本ぽてと）",
-      "topics": ["文化", "社会"],
+      "topics": ["社会", "文化"],
       "trackId": "1000777938372",
       "url": "https://podcasts.apple.com/jp/podcast/%E5%83%8D%E3%81%8D%E8%80%85%E3%83%A9%E3%82%B8%E3%82%AA-%E3%83%A9%E3%82%A4%E3%83%96%E6%84%9F-%E5%B7%A5%E8%97%A4%E9%83%81%E5%AD%90-%E5%B1%B1%E6%9C%AC%E3%81%BD%E3%81%A6%E3%81%A8/id1546033052?i=1000777938372&uo=4"
     },
@@ -4691,7 +4691,7 @@
       "releaseDate": "2026-07-20T21:30:00Z",
       "show": "文化系トークラジオ Life～社会時評＆カルチャー",
       "title": "新刊『脱法』解剖！90年代から令和へ続くドラッグカルチャーの裏歴史～ゲスト：磯部涼さん▽海猫沢めろんのブックカフェ 第14回",
-      "topics": ["文化", "社会"],
+      "topics": ["社会", "文化"],
       "trackId": "1000777622484",
       "url": "https://podcasts.apple.com/jp/podcast/%E6%96%B0%E5%88%8A-%E8%84%B1%E6%B3%95-%E8%A7%A3%E5%89%96-90%E5%B9%B4%E4%BB%A3%E3%81%8B%E3%82%89%E4%BB%A4%E5%92%8C%E3%81%B8%E7%B6%9A%E3%81%8F%E3%83%89%E3%83%A9%E3%83%83%E3%82%B0%E3%82%AB%E3%83%AB%E3%83%81%E3%83%A3%E3%83%BC%E3%81%AE%E8%A3%8F%E6%AD%B4%E5%8F%B2-%E3%82%B2%E3%82%B9%E3%83%88-%E7%A3%AF%E9%83%A8%E6%B6%BC%E3%81%95%E3%82%93-%E6%B5%B7%E7%8C%AB%E6%B2%A2%E3%82%81%E3%82%8D%E3%82%93%E3%81%AE%E3%83%96%E3%83%83%E3%82%AF%E3%82%AB%E3%83%95%E3%82%A7/id1546033052?i=1000777622484&uo=4"
     },
