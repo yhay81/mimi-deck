@@ -11,7 +11,7 @@
 - 最大20件をブラウザの「今度聴く」へ保存
 - Apple Podcastsの番組ページで聴く
 
-AppleのiTunes Search APIを検索元として使います。検索語、番組名、保存カードはD1へ記録しません。Better Auth、外部解析SDK、音声プロキシ、決済はありません。
+AppleのiTunes Search APIから定期生成した公開カタログを検索元として使います。利用者の検索語をAppleへ直接送信せず、検索語、番組名、保存カードはD1へ記録しません。Better Auth、外部解析SDK、音声プロキシ、決済はありません。
 
 ## Development
 
@@ -26,6 +26,7 @@ npm run dev
 
 ```powershell
 npm run release:check
+npm run catalog:update
 npm run check
 npm test
 npm run build

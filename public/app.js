@@ -341,10 +341,7 @@
         resultCount.textContent = "0件";
       }
       if (status instanceof HTMLElement) {
-        status.textContent =
-          error instanceof Error && error.message === "rate_limited"
-            ? "検索が続いています。1分ほど待ってから試してください。"
-            : "いま検索できません。少し待ってからもう一度お試しください。";
+        status.textContent = "検索データを読み込めません。ページを再読み込みしてください。";
       }
     }
   };

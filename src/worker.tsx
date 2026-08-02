@@ -4,24 +4,29 @@ import { requestId } from "hono/request-id";
 import { securityHeaders } from "./middleware/security";
 import { HomePage, PrivacyPage } from "./ui/pages";
 
-type RateLimiter = {
-  limit(input: { key: string }): Promise<{ success: boolean }>;
-};
-
 export type Bindings = {
   ASSETS: Fetcher;
   DB: D1Database;
-  SEARCH_RATE_LIMITER: RateLimiter;
 };
 
-type AppleResult = Record<string, unknown>;
-type AppleResponse = {
-  results?: AppleResult[];
+type CatalogEpisode = {
+  artwork: string;
+  collectionId: string;
+  description: string;
+  durationMs: number;
+  genre: string;
+  releaseDate: string;
+  show: string;
+  title: string;
+  topics: string[];
+  trackId: string;
+  url: string;
 };
+type CatalogPayload = { episodes?: CatalogEpisode[]; generatedAt?: string };
 
 const eventNames = new Set(["visited", "searched", "saved", "opened", "returned"]);
 const sessionIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const japanesePattern = /[\u3040-\u30ff\u3400-\u9fff]/;
+let catalogPromise: Promise<CatalogEpisode[]> | undefined;
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -31,31 +36,6 @@ app.use("*", securityHeaders);
 app.get("/", (c) => c.html(<HomePage />));
 app.get("/privacy", (c) => c.html(<PrivacyPage />));
 
-function stringValue(value: unknown, maximum = 240) {
-  return typeof value === "string" ? value.trim().slice(0, maximum) : "";
-}
-
-function safeUrl(value: unknown, allowedHost: (host: string) => boolean) {
-  const raw = stringValue(value, 2048);
-  try {
-    const url = new URL(raw);
-    return url.protocol === "https:" && allowedHost(url.hostname) ? url.toString() : "";
-  } catch {
-    return "";
-  }
-}
-
-function cleanDescription(value: unknown) {
-  return stringValue(value, 1200)
-    .replaceAll(/<[^>]*>/g, "")
-    .replaceAll("&amp;", "&")
-    .replaceAll("&quot;", '"')
-    .replaceAll("&#39;", "'")
-    .replaceAll(/\s+/g, " ")
-    .trim()
-    .slice(0, 240);
-}
-
 function hasControlCharacters(value: string) {
   return Array.from(value).some((character) => {
     const code = character.charCodeAt(0);
@@ -63,40 +43,72 @@ function hasControlCharacters(value: string) {
   });
 }
 
-function mapEpisode(item: AppleResult) {
-  const title = stringValue(item.trackName, 180);
-  const show = stringValue(item.collectionName, 140);
-  const description = cleanDescription(item.description ?? item.shortDescription);
-  const japaneseText = `${title} ${show} ${description}`;
-  const trackId =
-    typeof item.trackId === "number" || typeof item.trackId === "string"
-      ? String(item.trackId).slice(0, 32)
-      : "";
+function normalizeSearchText(value: string) {
+  return value.normalize("NFKC").replaceAll(/\s+/g, " ").trim().toLocaleLowerCase("ja-JP");
+}
 
-  if (!title || !show || !trackId || !japanesePattern.test(japaneseText)) {
-    return null;
+function isCatalogEpisode(value: unknown): value is CatalogEpisode {
+  if (!value || typeof value !== "object") {
+    return false;
   }
+  const episode = value as Partial<CatalogEpisode>;
+  return (
+    typeof episode.artwork === "string" &&
+    episode.artwork.startsWith("https://") &&
+    typeof episode.collectionId === "string" &&
+    typeof episode.description === "string" &&
+    typeof episode.durationMs === "number" &&
+    typeof episode.genre === "string" &&
+    typeof episode.releaseDate === "string" &&
+    typeof episode.show === "string" &&
+    typeof episode.title === "string" &&
+    Array.isArray(episode.topics) &&
+    episode.topics.every((topic) => typeof topic === "string") &&
+    typeof episode.trackId === "string" &&
+    typeof episode.url === "string" &&
+    episode.url.startsWith("https://podcasts.apple.com/")
+  );
+}
 
-  return {
-    artwork: safeUrl(item.artworkUrl600 ?? item.artworkUrl160, (host) =>
-      host.endsWith(".mzstatic.com"),
-    ),
-    collectionId:
-      typeof item.collectionId === "number" || typeof item.collectionId === "string"
-        ? String(item.collectionId).slice(0, 32)
-        : "",
-    description: description || "番組ページでエピソードの詳しい内容を確認できます。",
-    durationMs:
-      typeof item.trackTimeMillis === "number" && Number.isFinite(item.trackTimeMillis)
-        ? Math.max(0, Math.min(item.trackTimeMillis, 86_400_000))
-        : 0,
-    genre: stringValue(item.primaryGenreName, 40),
-    releaseDate: stringValue(item.releaseDate, 40),
-    show,
-    title,
-    trackId,
-    url: safeUrl(item.trackViewUrl, (host) => host === "podcasts.apple.com"),
+function loadCatalog(assets: Fetcher, requestUrl: string) {
+  catalogPromise ??= assets
+    .fetch(new Request(new URL("/episodes.json", requestUrl)))
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`catalog_http_${response.status}`);
+      }
+      const payload = (await response.json()) as CatalogPayload;
+      return (Array.isArray(payload.episodes) ? payload.episodes : [])
+        .filter(isCatalogEpisode)
+        .slice(0, 500);
+    });
+  return catalogPromise;
+}
+
+function episodeScore(episode: CatalogEpisode, query: string) {
+  const normalized = normalizeSearchText(query);
+  const tokens = normalized.split(" ").filter(Boolean);
+  const fields = {
+    description: normalizeSearchText(episode.description),
+    genre: normalizeSearchText(episode.genre),
+    show: normalizeSearchText(episode.show),
+    title: normalizeSearchText(episode.title),
+    topics: normalizeSearchText(episode.topics.join(" ")),
   };
+  let score = 0;
+  if (fields.title.includes(normalized)) score += 14;
+  if (fields.topics.includes(normalized)) score += 12;
+  if (fields.show.includes(normalized)) score += 8;
+  if (fields.description.includes(normalized)) score += 5;
+  if (fields.genre.includes(normalized)) score += 3;
+  for (const token of tokens) {
+    if (fields.title.includes(token)) score += 6;
+    if (fields.topics.includes(token)) score += 5;
+    if (fields.show.includes(token)) score += 4;
+    if (fields.description.includes(token)) score += 2;
+    if (fields.genre.includes(token)) score += 1;
+  }
+  return score;
 }
 
 app.post("/api/search", async (c) => {
@@ -113,14 +125,6 @@ app.post("/api/search", async (c) => {
   const fetchSite = c.req.header("sec-fetch-site");
   if (fetchSite && fetchSite !== "same-origin") {
     return c.json({ error: "cross_site_request" }, 403);
-  }
-
-  const rate = await c.env.SEARCH_RATE_LIMITER.limit({
-    key: c.req.header("cf-connecting-ip") ?? "unknown",
-  });
-  if (!rate.success) {
-    c.header("Retry-After", "60");
-    return c.json({ error: "rate_limited" }, 429);
   }
 
   let rawPayload: string;
@@ -144,41 +148,29 @@ app.post("/api/search", async (c) => {
     payload &&
     typeof payload === "object" &&
     typeof (payload as { query?: unknown }).query === "string"
-      ? (payload as { query: string }).query.normalize("NFKC").replaceAll(/\s+/g, " ").trim()
+      ? normalizeSearchText((payload as { query: string }).query)
       : "";
   if (query.length < 1 || query.length > 40 || hasControlCharacters(query)) {
     return c.json({ error: "invalid_query" }, 400);
   }
 
-  const parameters = new URLSearchParams({
-    attribute: "descriptionTerm",
-    country: "JP",
-    entity: "podcastEpisode",
-    explicit: "No",
-    lang: "ja_jp",
-    limit: "16",
-    media: "podcast",
-    term: query,
-  });
-  const upstream = await fetch(`https://itunes.apple.com/search?${parameters.toString()}`, {
-    cf: {
-      cacheEverything: true,
-      cacheTtl: 1800,
-    },
-    headers: {
-      accept: "application/json",
-      "user-agent": "MimiDeck/0.1 (+https://mimi-deck.yhay81.com)",
-    },
-  });
-  if (!upstream.ok) {
-    return c.json({ error: "upstream_unavailable" }, 502);
+  let catalog: CatalogEpisode[];
+  try {
+    catalog = await loadCatalog(c.env.ASSETS, c.req.url);
+  } catch {
+    catalogPromise = undefined;
+    return c.json({ error: "catalog_unavailable" }, 503);
   }
-
-  const data = (await upstream.json()) as AppleResponse;
-  const episodes = (Array.isArray(data.results) ? data.results : [])
-    .map(mapEpisode)
-    .filter((episode) => episode !== null && episode.url && episode.artwork)
-    .slice(0, 12);
+  const episodes = catalog
+    .map((episode) => ({ episode, score: episodeScore(episode, query) }))
+    .filter(({ score }) => score > 0)
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        right.episode.releaseDate.localeCompare(left.episode.releaseDate),
+    )
+    .slice(0, 12)
+    .map(({ episode }) => episode);
 
   return c.json({ episodes });
 });

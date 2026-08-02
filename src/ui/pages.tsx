@@ -130,10 +130,10 @@ export function PrivacyPage() {
     <Layout title={`プライバシー | ${product.name}`}>
       <article class="prose">
         <p class="eyebrow">PRIVACY</p>
-        <h1>検索語は、検索のためだけに送ります。</h1>
+        <h1>検索語は、公開カタログの照合だけに使います。</h1>
         <p>
-          入力したテーマは検索時にAppleのiTunes Search APIへ送信します。Mimi
-          Deckのデータベースには検索語、番組名、エピソード名を保存しません。
+          入力したテーマはMimi Deck内の公開カタログと照合し、Appleへ直接送信しません。Mimi
+          Deckのデータベースにも検索語、番組名、エピソード名を保存しません。
         </p>
         <h2>この端末に保存するもの</h2>
         <p>

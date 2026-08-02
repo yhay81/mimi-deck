@@ -5,17 +5,14 @@ import { app, type Bindings } from "../src/worker";
 const bind = vi.fn(() => ({}) as D1PreparedStatement);
 const prepare = vi.fn(() => ({ bind }) as unknown as D1PreparedStatement);
 const batch = vi.fn(() => Promise.resolve([]));
-const limit = vi.fn(() => Promise.resolve({ success: true }));
+const assetsFetch = vi.fn(() => Promise.resolve(Response.json({ episodes: [] })));
 const bindings = {
   ASSETS: {
-    fetch: () => Promise.resolve(new Response("not used")),
+    fetch: assetsFetch,
   },
   DB: {
     batch,
     prepare,
-  },
-  SEARCH_RATE_LIMITER: {
-    limit,
   },
 } as unknown as Bindings;
 
@@ -24,17 +21,18 @@ const eventPayload = {
   sessionId: "7c0dbe70-8c47-4fc0-aa62-52427133c612",
 };
 
-const appleEpisode = {
-  artworkUrl600: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/example/600x600bb.jpg",
-  collectionId: 1450522865,
-  collectionName: "歴史を面白く学ぶラジオ",
-  description: "<b>平安時代</b>の暮らしを、資料から読み解きます。",
-  primaryGenreName: "歴史",
+const catalogEpisode = {
+  artwork: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/example/600x600bb.jpg",
+  collectionId: "1450522865",
+  description: "平安時代の暮らしを、資料から読み解きます。",
+  durationMs: 2492000,
+  genre: "歴史",
   releaseDate: "2026-07-19T21:00:00Z",
-  trackId: 1000777464059,
-  trackName: "平安京の一日",
-  trackTimeMillis: 2492000,
-  trackViewUrl: "https://podcasts.apple.com/jp/podcast/example/id1450522865?i=1000777464059",
+  show: "歴史を面白く学ぶラジオ",
+  title: "平安京の一日",
+  topics: ["歴史"],
+  trackId: "1000777464059",
+  url: "https://podcasts.apple.com/jp/podcast/example/id1450522865?i=1000777464059",
 };
 
 describe("worker", () => {
@@ -42,31 +40,12 @@ describe("worker", () => {
     bind.mockClear();
     prepare.mockClear();
     batch.mockClear();
-    limit.mockClear();
-    limit.mockResolvedValue({ success: true });
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() =>
-        Promise.resolve(
-          Response.json({
-            results: [
-              appleEpisode,
-              {
-                ...appleEpisode,
-                artworkUrl600: "https://attacker.example/art.jpg",
-                trackId: 2,
-              },
-              {
-                ...appleEpisode,
-                collectionName: "English show",
-                description: "English only",
-                trackId: 3,
-                trackName: "English only",
-              },
-            ],
-          }),
-        ),
-      ),
+    assetsFetch.mockClear();
+    assetsFetch.mockResolvedValue(
+      Response.json({
+        episodes: [catalogEpisode],
+        generatedAt: "2026-08-02T00:00:00.000Z",
+      }),
     );
   });
 
@@ -93,13 +72,14 @@ describe("worker", () => {
     const html = await response.text();
 
     expect(response.status).toBe(200);
-    expect(html).toContain("iTunes Search API");
+    expect(html).toContain("公開カタログ");
+    expect(html).toContain("Appleへ直接送信しません");
     expect(html).toContain("検索語");
     expect(html).toContain("localStorage");
     expect(html).toContain("35日間");
   });
 
-  it("returns sanitized Japanese Apple podcast episodes", async () => {
+  it("returns matching Japanese podcast episodes from the local catalog", async () => {
     const response = await app.request(
       "/api/search",
       {
@@ -122,30 +102,7 @@ describe("worker", () => {
       show: "歴史を面白く学ぶラジオ",
       title: "平安京の一日",
     });
-    expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining("term=%E5%B9%B3%E5%AE%89+%E6%99%82%E4%BB%A3"),
-      expect.objectContaining({
-        cf: { cacheEverything: true, cacheTtl: 1800 },
-      }),
-    );
-    expect(limit).toHaveBeenCalledOnce();
-  });
-
-  it("limits repeated upstream searches", async () => {
-    limit.mockResolvedValueOnce({ success: false });
-    const response = await app.request(
-      "/api/search",
-      {
-        body: JSON.stringify({ query: "歴史" }),
-        headers: { "content-type": "application/json" },
-        method: "POST",
-      },
-      bindings,
-    );
-
-    expect(response.status).toBe(429);
-    expect(response.headers.get("retry-after")).toBe("60");
-    expect(fetch).not.toHaveBeenCalled();
+    expect(assetsFetch).toHaveBeenCalledOnce();
   });
 
   it.each([

@@ -8,6 +8,7 @@
     "indexnow": "pwsh -NoLogo -NoProfile -File ops/submit-indexnow.ps1 -BaseUrl https://mimi-deck.yhay81.com",
     "metrics": "pwsh -NoLogo -NoProfile -File ops/product-metrics.ps1",
     "build": "vp build",
+    "catalog:update": "node ops/update-catalog.mjs && oxfmt --write public/episodes.json",
     "preview": "vp preview",
     "check": "vp check",
     "check:fix": "oxlint --fix . && oxfmt --write . && tsc --noEmit",
