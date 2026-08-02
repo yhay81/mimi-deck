@@ -77,28 +77,54 @@ function catalogEpisodes(payload: CatalogPayload) {
     .slice(0, 750);
 }
 
+function mergeCatalogs(...catalogs: CatalogEpisode[][]) {
+  const episodes = new Map<string, CatalogEpisode>();
+  for (const catalog of catalogs) {
+    for (const episode of catalog) {
+      const current = episodes.get(episode.trackId);
+      episodes.set(
+        episode.trackId,
+        current
+          ? { ...episode, topics: [...new Set([...current.topics, ...episode.topics])] }
+          : episode,
+      );
+    }
+  }
+  return [...episodes.values()]
+    .sort((left, right) => right.releaseDate.localeCompare(left.releaseDate))
+    .slice(0, 1000);
+}
+
 function loadCatalog(assets: Fetcher, requestUrl: string) {
   catalogPromise ??= (async () => {
+    let currentEpisodes: CatalogEpisode[] = [];
     try {
       const current = await fetch(catalogUrl, {
         cf: { cacheEverything: true, cacheTtl: 3600 },
         headers: { accept: "application/json" },
       });
       if (current.ok) {
-        const episodes = catalogEpisodes((await current.json()) as CatalogPayload);
-        if (episodes.length >= 100) {
-          return episodes;
-        }
+        currentEpisodes = catalogEpisodes((await current.json()) as CatalogPayload);
       }
     } catch {
       // The deployed catalog below keeps search available when GitHub is unavailable.
     }
 
-    const bundled = await assets.fetch(new Request(new URL("/episodes.json", requestUrl)));
-    if (!bundled.ok) {
-      throw new Error(`catalog_http_${bundled.status}`);
+    let bundledEpisodes: CatalogEpisode[] = [];
+    try {
+      const bundled = await assets.fetch(new Request(new URL("/episodes.json", requestUrl)));
+      if (bundled.ok) {
+        bundledEpisodes = catalogEpisodes((await bundled.json()) as CatalogPayload);
+      }
+    } catch {
+      // A valid current catalog can still serve search if the asset binding fails.
     }
-    return catalogEpisodes((await bundled.json()) as CatalogPayload);
+
+    const episodes = mergeCatalogs(currentEpisodes, bundledEpisodes);
+    if (episodes.length < 100) {
+      throw new Error("catalog_too_small");
+    }
+    return episodes;
   })();
   return catalogPromise;
 }

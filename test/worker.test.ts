@@ -51,16 +51,13 @@ describe("worker", () => {
     remoteFetch.mockClear();
     remoteFetch.mockResolvedValue(
       Response.json({
-        episodes: [
-          catalogEpisode,
-          ...Array.from({ length: 99 }, (_, index) => ({
-            ...catalogEpisode,
-            description: "子育ての工夫を紹介します。",
-            title: `子育て便り ${index + 1}`,
-            topics: ["子育て"],
-            trackId: `child-${index + 1}`,
-          })),
-        ],
+        episodes: Array.from({ length: 100 }, (_, index) => ({
+          ...catalogEpisode,
+          description: "子育ての工夫を紹介します。",
+          title: `子育て便り ${index + 1}`,
+          topics: ["子育て"],
+          trackId: `child-${index + 1}`,
+        })),
         generatedAt: "2026-08-02T00:00:00.000Z",
       }),
     );
@@ -124,7 +121,7 @@ describe("worker", () => {
       "https://raw.githubusercontent.com/yhay81/mimi-deck/main/public/episodes.json",
       expect.objectContaining({ cf: { cacheEverything: true, cacheTtl: 3600 } }),
     );
-    expect(assetsFetch).not.toHaveBeenCalled();
+    expect(assetsFetch).toHaveBeenCalledOnce();
   });
 
   it.each([
